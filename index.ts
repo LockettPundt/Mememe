@@ -1,7 +1,12 @@
-import { Client, Intents } from 'discord.js';
+import { Client, Intents, Collection } from 'discord.js';
 import { config } from 'dotenv';
+import fs from 'fs';
 config();
-const client = new Client({
+class CustomClient extends Client {
+  commands?: Collection<unknown, any>;
+}
+
+const client: CustomClient = new Client({
   intents: [
     Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.GUILDS,
@@ -9,16 +14,41 @@ const client = new Client({
   ],
 });
 
-client.on(`ready`, () => {
-  console.log(`Yay! You're logged in as ${client.user?.tag}...`);
+client.commands = new Collection();
+const commandFiles = fs
+  .readdirSync('./commands')
+  .filter((file) => file.endsWith('.ts') || file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client?.commands?.set(command.default.data.name, command.default);
+}
+
+client.on('ready', () => {
+  console.log(`You're logged in as ${client.user?.tag}...`);
 });
 
-client.on(`message`, async (msg) => {
-  console.log(`here is the msg object\n\n`, msg);
-  if (msg.author.bot) {
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) {
     return;
-  } else {
-    msg.reply(`Hi there ${msg.author.username}`);
+  }
+
+  const command = client.commands?.get(interaction.commandName);
+
+  console.log('here is the command being sent', command);
+
+  if (!command) {
+    return;
+  }
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({
+      content: 'There was an error while executing this command!',
+      ephemeral: true,
+    });
   }
 });
 
