@@ -1,12 +1,20 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@discordjs/builders': ^0.11.0
+  '@discordjs/rest': ^0.2.0-canary.0
+  axios: ^0.24.0
+  discord-api-types: ^0.26.1
   discord.js: ^13.6.0
   dotenv: ^13.0.1
   ts-node: ^10.4.0
   typescript: ^4.5.4
 
 dependencies:
+  '@discordjs/builders': 0.11.0
+  '@discordjs/rest': 0.2.0-canary.0
+  axios: 0.24.0
+  discord-api-types: 0.26.1
   discord.js: 13.6.0
   dotenv: 13.0.1
 
@@ -39,13 +47,38 @@ packages:
       zod: 3.11.6
     dev: false
 
+  /@discordjs/collection/0.3.2:
+    resolution: {integrity: sha512-dMjLl60b2DMqObbH1MQZKePgWhsNe49XkKBZ0W5Acl5uVV43SN414i2QfZwRI7dXAqIn8pEWD2+XXQFn9KWxqg==}
+    engines: {node: '>=16.0.0', npm: '>=7.0.0'}
+    dev: false
+
   /@discordjs/collection/0.4.0:
     resolution: {integrity: sha512-zmjq+l/rV35kE6zRrwe8BHqV78JvIh2ybJeZavBi5NySjWXqN3hmmAKg7kYMMXSeiWtSsMoZ/+MQi0DiQWy2lw==}
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dev: false
 
+  /@discordjs/rest/0.2.0-canary.0:
+    resolution: {integrity: sha512-jOxz1aqTEzn9N0qaJcZbHz6FbA0oq+vjpXUKkQzgfMihO6gC+kLlpRnFqG25T/aPYbjaR1UM/lGhrGBB1dutqg==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@discordjs/collection': 0.3.2
+      '@sapphire/async-queue': 1.1.9
+      '@sapphire/snowflake': 3.0.1
+      discord-api-types: 0.25.2
+      form-data: 4.0.0
+      node-fetch: 2.6.7
+      tslib: 2.3.1
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
   /@sapphire/async-queue/1.1.9:
     resolution: {integrity: sha512-CbXaGwwlEMq+l1TRu01FJCvySJ1CEFKFclHT48nIfNeZXaAAmmwwy7scUKmYHPUa3GhoMp6Qr1B3eAJux6XgOQ==}
+    engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
+    dev: false
+
+  /@sapphire/snowflake/3.0.1:
+    resolution: {integrity: sha512-v+wCC2q9DK3OhG7Vcdt/8A/INAYiyhlMD5snakmXGBN1usLBwSGJVJBjDHv4VGI5C9YYl4UdW5Ovr3arvYsJXQ==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
@@ -106,6 +139,14 @@ packages:
     resolution: {integrity: sha1-x57Zf380y48robyXkLzDZkdLS3k=}
     dev: false
 
+  /axios/0.24.0:
+    resolution: {integrity: sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==}
+    dependencies:
+      follow-redirects: 1.14.7
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /combined-stream/1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
@@ -126,6 +167,11 @@ packages:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
     engines: {node: '>=0.3.1'}
     dev: true
+
+  /discord-api-types/0.25.2:
+    resolution: {integrity: sha512-O243LXxb5gLLxubu5zgoppYQuolapGVWPw3ll0acN0+O8TnPUE2kFp9Bt3sTRYodw8xFIknOVxjSeyWYBpVcEQ==}
+    engines: {node: '>=12'}
+    dev: false
 
   /discord-api-types/0.26.1:
     resolution: {integrity: sha512-T5PdMQ+Y1MEECYMV5wmyi9VEYPagEDEi4S0amgsszpWY0VB9JJ/hEvM6BgLhbdnKky4gfmZEXtEEtojN8ZKJQQ==}
@@ -154,6 +200,16 @@ packages:
   /dotenv/13.0.1:
     resolution: {integrity: sha512-u3KAkK+VHk01+D7V6SFtSJl2JScX1Yi4anKsKXS4oT8s8LnL5xgJe7XFAZ1bSsOfAmxU54OwOuhaLv3v70oXgw==}
     engines: {node: '>=12'}
+    dev: false
+
+  /follow-redirects/1.14.7:
+    resolution: {integrity: sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
     dev: false
 
   /form-data/3.0.1:
