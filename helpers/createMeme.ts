@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { config } from 'dotenv';
-import { stringify } from 'querystring';
 import { getMemeList, Meme } from './getMemeList';
 config();
 
@@ -27,7 +26,7 @@ export const createMeme = async ({
     };
 
     inputs.forEach((input, index) => {
-      params[`boxes[${index}][text]`] = input;
+      params[`boxes[${index}][text]`] = input.toUpperCase();
     });
 
     const result = await axios({
