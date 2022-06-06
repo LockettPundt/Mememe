@@ -8,6 +8,8 @@
     "register-commands": "ts-node ./scripts/deploy-commands.ts",
     "watch:start": "nodemon ./dist/index.js",
     "watch": "tsc && concurrently npm:watch:*",
+    "start:run": "node ./dist/index.js",
+    "start": "tsc && concurrently npm:start:*",
     "postinstall": "tsc"
   },
   "keywords": [],
