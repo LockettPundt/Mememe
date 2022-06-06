@@ -9,7 +9,7 @@
     "watch:start": "nodemon ./dist/index.js",
     "watch": "tsc && concurrently npm:watch:*",
     "start:run": "node ./dist/index.js",
-    "start": "tsc && npm concurrently npm:start:*"
+    "start": "tsc && concurrently npm:start:*"
   },
   "keywords": [],
   "author": "",
