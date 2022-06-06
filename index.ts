@@ -1,5 +1,6 @@
 import discordModals, {
   Modal,
+  ModalSubmitInteraction,
   showModal,
   TextInputComponent,
 } from 'discord-modals';
@@ -263,12 +264,7 @@ client.on(`interactionCreate`, async (interaction) => {
     .addComponents(
       ...Array.from({ length: numberOftextFieldsForMeme }).map((_, i) =>
         new TextInputComponent()
-          .setCustomId(
-            createCustomId({
-              id: `input-${i}`,
-              page,
-            })
-          )
+          .setCustomId(`input-${i}`)
           .setLabel(`Text Box ${i + 1}`)
           .setStyle('SHORT')
           .setMinLength(1)
@@ -284,12 +280,17 @@ client.on(`interactionCreate`, async (interaction) => {
   });
 });
 
-client.on(`modalSubmit`, async (modal) => {
+client.on(`modalSubmit`, async (modal: ModalSubmitInteraction) => {
   // send stuff to api, await reply and then post picture.
   const { selectionId } = JSON.parse(modal.customId);
-  const inputs: string[] = modal.fields.map((field) => field.value);
+  console.log(modal);
+  const inputLength = modal.fields.length;
+  const inputs: string[] = Array.from({ length: inputLength }).map((_, i) =>
+    modal.getTextInputValue(`input-${i}`)
+  );
+
   const createdMeme = await createMeme({ templateId: selectionId, inputs });
-  console.log(createdMeme);
+  console.log(createdMeme, { user: modal.user.username });
 
   if (createdMeme) {
     const embed = new MessageEmbed({
@@ -309,7 +310,7 @@ client.on(`modalSubmit`, async (modal) => {
       components: [],
     });
   } else {
-    console.log(`some kind of error handling`);
+    console.log(`some kind of error handling...`);
   }
 });
 
