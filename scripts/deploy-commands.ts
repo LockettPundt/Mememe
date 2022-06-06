@@ -19,7 +19,7 @@ if (TOKEN && CLIENT_ID && GUILD_ID) {
     try {
       console.log('Started refreshing application (/) commands.');
 
-      await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+      await rest.put(Routes.applicationCommands(CLIENT_ID), {
         body: commands,
       });
 

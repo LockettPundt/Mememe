@@ -6,12 +6,10 @@
   "scripts": {
     "dev": "nodemon index.ts",
     "register-commands": "ts-node ./scripts/deploy-commands.ts",
-    "watch:build": "tsc -w",
     "watch:start": "nodemon ./dist/index.js",
-    "watch": "concurrently pnpm:watch:*",
-    "start:build": "tsc",
+    "watch": "tsc && concurrently pnpm:watch:*",
     "start:run": "node ./dist/index.js",
-    "start": "concurrently pnpm:start:*"
+    "start": "tsc && concurrently pnpm:start:*"
   },
   "keywords": [],
   "author": "",
