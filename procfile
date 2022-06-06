@@ -1,1 +1,1 @@
-web: /dist/index.js
+worker: /dist/index.js

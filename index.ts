@@ -283,7 +283,6 @@ client.on(`interactionCreate`, async (interaction) => {
 client.on(`modalSubmit`, async (modal: ModalSubmitInteraction) => {
   // send stuff to api, await reply and then post picture.
   const { selectionId } = JSON.parse(modal.customId);
-  console.log(modal);
   const inputLength = modal.fields.length;
   const inputs: string[] = Array.from({ length: inputLength }).map((_, i) =>
     modal.getTextInputValue(`input-${i}`)
