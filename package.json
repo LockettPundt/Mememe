@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "nodemon index.ts",
     "register-commands": "ts-node ./scripts/deploy-commands.ts",
+    "watch:build": "tsc -w",
     "watch:start": "nodemon ./dist/index.js",
-    "watch": "tsc && concurrently npm:watch:*",
+    "watch": "concurrently pnpm:watch:*",
     "start:run": "node ./dist/index.js",
     "start": "tsc && concurrently npm:start:*",
     "postinstall": "tsc"
