@@ -6,13 +6,14 @@ import {
   StringSelectMenuBuilder,
   Events,
   ButtonStyle,
+  TextInputStyle,
 } from 'discord.js';
 import { config } from 'dotenv';
 import fs from 'fs';
 import { createCustomId } from './helpers/createCustomId';
 import { createMeme } from './helpers/createMeme';
 import { getMemeList } from './helpers/getMemeList';
-import { ButtonBuilder, EmbedBuilder } from '@discordjs/builders';
+import { ButtonBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder } from '@discordjs/builders';
 config();
 
 class CustomClient extends Client {
@@ -184,7 +185,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           page,
         })
       )
-      .setPlaceholder('None Selected')
+      .setPlaceholder(`None Selected`)
       .addOptions(
         currentPageMemeList.map((meme) => ({
           label: meme.name,
@@ -226,65 +227,68 @@ client.on(Events.InteractionCreate, async (interaction) => {
   });
 });
 
-// Meme template text modal
-// client.on(`interactionCreate`, async (interaction) => {
-//   if (!interaction.isButton()) return;
-//   const { id, selectionId, page } = JSON.parse(interaction.customId);
+// * Meme template text modal
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isButton()) {
+    return;
+  }
+  const { id, selectionId, page } = JSON.parse(interaction.customId);
 
-//   if (!id || id !== `set-template`) return;
+  if (!id || id !== `set-template`) return;
 
-//   const memeList = await getMemeList();
+  const memeList = await getMemeList();
 
-//   const selectedMeme = memeList.find((meme) => meme.id === selectionId);
-//   if (!selectedMeme) {
-//     return await interaction.reply(
-//       'Hmmm, looks like your selection is busted. Try another.'
-//     );
+  const selectedMeme = memeList.find((meme) => meme.id === selectionId);
+
+  if (!selectedMeme) {
+    interaction.reply('Hmmm, looks like your selection is busted. Try another.');
+    return;
+  }
+
+  const numberOftextFieldsForMeme = selectedMeme.box_count;
+
+  const modal = new ModalBuilder()
+    .setCustomId(
+      createCustomId({
+        id: `modal`,
+        selectionId: selectedMeme.id,
+        page,
+      })
+    )
+    .setTitle(`Add your meme text`)
+    .addComponents(
+      new ActionRowBuilder<TextInputBuilder>().addComponents(
+        ...Array.from({ length: numberOftextFieldsForMeme }).map((_, index) =>
+          new TextInputBuilder()
+            .setCustomId(`input-${index}`)
+            .setLabel(`Text Box ${index + 1}`)
+            .setStyle(TextInputStyle.Short)
+            .setMinLength(1)
+            .setMaxLength(100)
+            .setRequired(true)
+        )
+      )
+    );
+
+  interaction.showModal(modal);
+});
+
+// client.on(Events.InteractionCreate, async (interaction) => {
+//   if (!interaction.isModalSubmit()) {
+//     return
 //   }
-
-//   const numberOftextFieldsForMeme = selectedMeme.box_count;
-
-//   const modal = new Modal()
-//     .setCustomId(
-//       createCustomId({
-//         id: `modal`,
-//         selectionId: selectedMeme.id,
-//         page,
-//       })
-//     )
-//     .setTitle('Add your meme text')
-//     .addComponents(
-//       ...Array.from({ length: numberOftextFieldsForMeme }).map((_, i) =>
-//         new TextInputComponent()
-//           .setCustomId(`input-${i}`)
-//           .setLabel(`Text Box ${i + 1}`)
-//           .setStyle('SHORT')
-//           .setMinLength(1)
-//           .setMaxLength(100)
-//           .setDefaultValue('')
-//           .setRequired(true)
-//       )
-//     );
-
-//   showModal(modal, {
-//     interaction,
-//     client,
-//   });
-// });
-
-// client.on(`modalSubmit`, async (modal: ModalSubmitInteraction) => {
-//   // send stuff to api, await reply and then post picture.
-//   const { selectionId } = JSON.parse(modal.customId);
-//   const inputLength = modal.fields.length;
+//   // * Send inputs to api, await reply and then post picture.
+//   const { selectionId } = JSON.parse(interaction.customId);
+//   const inputLength = interaction.fields.length;
 //   const inputs: string[] = Array.from({ length: inputLength }).map((_, i) =>
-//     modal.getTextInputValue(`input-${i}`)
+//   interaction.getTextInputValue(`input-${i}`)
 //   );
 
 //   const createdMeme = await createMeme({ templateId: selectionId, inputs });
 //   console.log(createdMeme, { user: modal.user.username });
 
 //   if (createdMeme) {
-//     const embed = new MessageEmbed({
+//     const embed = new EmbedBuilder({
 //       image: {
 //         url: createdMeme.url,
 //       },
