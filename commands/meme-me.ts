@@ -1,30 +1,28 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import {
   CommandInteraction,
-  MessageActionRow,
-  MessageButton,
-  MessageSelectMenu,
+  ActionRowBuilder,
+  ButtonBuilder,
+  StringSelectMenuBuilder,
+  ButtonStyle,
 } from 'discord.js';
 import { getMemeList } from '../helpers/getMemeList';
 import { createCustomId } from '../helpers/createCustomId';
 
 const command = {
-  data: new SlashCommandBuilder()
-    .setName('mememe')
-    .setDefaultPermission(true)
-    .setDescription('Mememe...'),
+  data: new SlashCommandBuilder().setName(`mememe`).setDescription(`Mememe...`),
   async execute(interaction: CommandInteraction) {
     // * Create list of memes (25 limit)
     const memeList = await getMemeList();
-    const selectRow = new MessageActionRow().addComponents(
-      new MessageSelectMenu()
+    const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+      new StringSelectMenuBuilder()
         .setCustomId(
           createCustomId({
             page: 0,
             id: `meme-select`,
           })
         )
-        .setPlaceholder('None Selected')
+        .setPlaceholder(`None Selected`)
         .addOptions(
           memeList.slice(0, 25).map((meme) => ({
             label: meme.name,
@@ -34,20 +32,20 @@ const command = {
         )
     );
 
-    const row = new MessageActionRow().addComponents(
-      new MessageButton()
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
         .setCustomId(
           createCustomId({
             page: 1,
             id: `next`,
           })
         )
-        .setLabel('Next 25 templates')
-        .setStyle('PRIMARY')
+        .setLabel(`Next 25 templates`)
+        .setStyle(ButtonStyle.Primary)
     );
 
     await interaction.reply({
-      content: 'Select your meme template...',
+      content: `Select your meme template...`,
       components: [selectRow, row],
       ephemeral: true,
     });
