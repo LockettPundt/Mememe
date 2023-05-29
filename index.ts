@@ -7,17 +7,27 @@ import {
   Events,
   ButtonStyle,
   TextInputStyle,
+  CommandInteraction,
 } from 'discord.js';
 import { config } from 'dotenv';
 import fs from 'fs';
 import { createCustomId } from './helpers/createCustomId';
 import { createMeme } from './helpers/createMeme';
 import { getMemeList } from './helpers/getMemeList';
-import { ButtonBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder } from '@discordjs/builders';
+import {
+  ButtonBuilder,
+  EmbedBuilder,
+  ModalBuilder,
+  SlashCommandBuilder,
+  TextInputBuilder,
+} from '@discordjs/builders';
 config();
 
 class CustomClient extends Client {
-  commands?: Collection<string, any>;
+  commands?: Collection<
+    string,
+    { data: SlashCommandBuilder; execute: (interaction: CommandInteraction) => Promise<void> }
+  >;
 }
 
 const client: CustomClient = new CustomClient({
