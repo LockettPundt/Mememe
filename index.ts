@@ -1,42 +1,41 @@
 import {
   Client,
   Collection,
-  Intents,
+  GatewayIntentBits,
   ActionRowBuilder,
-  MessageButton,
-  MessageEmbed,
   StringSelectMenuBuilder,
   Events,
+  ButtonStyle,
 } from 'discord.js';
 import { config } from 'dotenv';
 import fs from 'fs';
 import { createCustomId } from './helpers/createCustomId';
 import { createMeme } from './helpers/createMeme';
 import { getMemeList } from './helpers/getMemeList';
+import { ButtonBuilder, EmbedBuilder } from '@discordjs/builders';
 config();
+
 class CustomClient extends Client {
-  commands?: Collection<unknown, any>;
+  commands?: Collection<string, any>;
 }
 
-const client: CustomClient = new Client({
+const client: CustomClient = new CustomClient({
   intents: [
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.DIRECT_MESSAGES,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.DirectMessages,
   ],
 });
 
 client.commands = new Collection();
-const commandFiles = fs
-  .readdirSync('./dist/commands')
-  .filter((file) => file.endsWith('.js'));
+const commandFiles = fs.readdirSync(`./dist/commands`).filter((file) => file.endsWith(`.js`));
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
-  client?.commands?.set(command.default.data.name, command.default);
+  client.commands.set(command.default.data.name, command);
 }
 
-client.on('ready', () => {
+client.once(Events.ClientReady, () => {
   console.log(`You're logged in as ${client.user?.tag}...`);
 });
 
@@ -57,17 +56,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content: 'There was an error while executing this command!',
+      content: `There was an error while executing this command!`,
       ephemeral: true,
     });
   }
 });
 
-// Embed current selection
+// * Embed current selection
 client.on(Events.InteractionCreate, async (interaction) => {
-  // if (!interaction.isStringSelectMenu()) {
-  //   return;
-  // }
+  if (!interaction.isStringSelectMenu()) {
+    return;
+  }
+
   const { page } = JSON.parse(interaction.customId);
 
   const memeList = await getMemeList();
@@ -76,14 +76,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
   const selectedMeme = memeList.find((meme) => meme.id === selectedValue);
 
   if (!selectedMeme) {
-    return await interaction.reply(
-      'Hmmm, looks like your selection is busted. Try another.'
-    );
+    interaction.reply(`Hmmm, looks like your selection is busted. Try another.`);
+    return;
   }
 
   const numberOftextFieldsForMeme: number = selectedMeme.box_count;
 
-  const embed = new MessageEmbed({
+  const embed = new EmbedBuilder({
     image: {
       url: selectedMeme.url,
     },
@@ -100,15 +99,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   const { id } = JSON.parse(interaction.customId);
 
-  const selectRow = new ActionRowBuilder().addComponents(
-    new MessageSelectMenu()
+  const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+    new StringSelectMenuBuilder()
       .setCustomId(
         createCustomId({
           id: `meme-select`,
           page,
         })
       )
-      .setPlaceholder('None Selected')
+      .setPlaceholder(`None Selected`)
       .addOptions(
         currentPageMemeList.map((meme) => ({
           label: meme.name,
@@ -121,8 +120,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
   const showBackButton = page !== 0;
   const showNextButton = memeList.slice(skip + 25).length > 0;
 
-  const row = new MessageActionRow().addComponents(
-    new MessageButton()
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
       .setCustomId(
         createCustomId({
           selectionId: selectedMeme.id,
@@ -130,27 +129,27 @@ client.on(Events.InteractionCreate, async (interaction) => {
           page,
         })
       )
-      .setLabel('Set Template Text')
-      .setStyle('SUCCESS'),
-    new MessageButton()
+      .setLabel(`Set Template Text`)
+      .setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
       .setCustomId(
         createCustomId({
           id: `previous`,
           page: page - 1,
         })
       )
-      .setLabel('Previous 25 templates')
-      .setStyle('SECONDARY')
+      .setLabel(`Previous 25 templates`)
+      .setStyle(ButtonStyle.Secondary)
       .setDisabled(!showBackButton),
-    new MessageButton()
+    new ButtonBuilder()
       .setCustomId(
         createCustomId({
           id: `next`,
           page: page + 1,
         })
       )
-      .setLabel('Next 25 templates')
-      .setStyle('PRIMARY')
+      .setLabel(`Next 25 templates`)
+      .setStyle(ButtonStyle.Primary)
       .setDisabled(!showNextButton)
   );
 
@@ -165,7 +164,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // TODO: get all meme ids from cache or just query for now. or in JSON?
 // TODO: send some kind of data object in interaction?
 
-// Meme pagination
+// * Meme pagination
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isButton()) return;
 
@@ -177,7 +176,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   const memeList = await getMemeList();
   const currentPageMemeList = memeList.slice(skip, skip + 25);
 
-  const selectRow = new ActionRowBuilder().addComponents(
+  const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
     new StringSelectMenuBuilder()
       .setCustomId(
         createCustomId({
@@ -198,26 +197,26 @@ client.on(Events.InteractionCreate, async (interaction) => {
   const showBackButton = page !== 0;
   const showNextButton = memeList.slice(skip + 25).length > 0;
 
-  const row = new MessageActionRow().addComponents(
-    new MessageButton()
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
       .setCustomId(
         createCustomId({
           id: `previous`,
           page: page - 1,
         })
       )
-      .setLabel('Previous 25 templates')
-      .setStyle('SECONDARY')
+      .setLabel(`Previous 25 templates`)
+      .setStyle(ButtonStyle.Secondary)
       .setDisabled(!showBackButton),
-    new MessageButton()
+    new ButtonBuilder()
       .setCustomId(
         createCustomId({
           id: `next`,
           page: page + 1,
         })
       )
-      .setLabel('Next 25 templates')
-      .setStyle('PRIMARY')
+      .setLabel(`Next 25 templates`)
+      .setStyle(ButtonStyle.Primary)
       .setDisabled(!showNextButton)
   );
 
