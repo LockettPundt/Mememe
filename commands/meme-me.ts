@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import {
-  BaseCommandInteraction,
+  CommandInteraction,
   MessageActionRow,
   MessageButton,
   MessageSelectMenu,
@@ -12,9 +12,9 @@ const command = {
   data: new SlashCommandBuilder()
     .setName('mememe')
     .setDefaultPermission(true)
-    .setDescription('Meme me...'),
-  async execute(interaction: BaseCommandInteraction) {
-    // create list of memes (25 limit)
+    .setDescription('Mememe...'),
+  async execute(interaction: CommandInteraction) {
+    // * Create list of memes (25 limit)
     const memeList = await getMemeList();
     const selectRow = new MessageActionRow().addComponents(
       new MessageSelectMenu()
