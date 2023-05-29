@@ -29,11 +29,11 @@ const client: CustomClient = new CustomClient({
 });
 
 client.commands = new Collection();
-const commandFiles = fs.readdirSync(`./dist/commands`).filter((file) => file.endsWith(`.js`));
+const commandFiles = fs.readdirSync('./dist/commands').filter((file) => file.endsWith(`.js`));
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
-  client.commands.set(command.default.data.name, command);
+  client.commands.set(command.default.data.name, command.default);
 }
 
 client.once(Events.ClientReady, () => {
@@ -257,8 +257,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
     )
     .setTitle(`Add your meme text`)
     .addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        ...Array.from({ length: numberOftextFieldsForMeme }).map((_, index) =>
+      ...Array.from({ length: numberOftextFieldsForMeme }).map((_, index) =>
+        new ActionRowBuilder<TextInputBuilder>().addComponents(
           new TextInputBuilder()
             .setCustomId(`input-${index}`)
             .setLabel(`Text Box ${index + 1}`)
@@ -273,40 +273,39 @@ client.on(Events.InteractionCreate, async (interaction) => {
   interaction.showModal(modal);
 });
 
-// client.on(Events.InteractionCreate, async (interaction) => {
-//   if (!interaction.isModalSubmit()) {
-//     return
-//   }
-//   // * Send inputs to api, await reply and then post picture.
-//   const { selectionId } = JSON.parse(interaction.customId);
-//   const inputLength = interaction.fields.length;
-//   const inputs: string[] = Array.from({ length: inputLength }).map((_, i) =>
-//   interaction.getTextInputValue(`input-${i}`)
-//   );
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isModalSubmit()) {
+    return;
+  }
 
-//   const createdMeme = await createMeme({ templateId: selectionId, inputs });
-//   console.log(createdMeme, { user: modal.user.username });
+  // * Send inputs to api, await reply and then post picture.
+  const { selectionId } = JSON.parse(interaction.customId);
+  const inputLength = interaction.fields.fields.size;
 
-//   if (createdMeme) {
-//     const embed = new EmbedBuilder({
-//       image: {
-//         url: createdMeme.url,
-//       },
-//     })
-//       .setTitle(`Go see your meme!`)
-//       .setURL(createdMeme.page_url)
-//       .setDescription(
-//         `Nice work ${modal.user.username}! The world is now a better place.`
-//       );
+  const inputs: string[] = Array.from({ length: inputLength }).map((_, i) =>
+    interaction.fields.getTextInputValue(`input-${i}`)
+  );
 
-//     modal.update({
-//       content: null,
-//       embeds: [embed],
-//       components: [],
-//     });
-//   } else {
-//     console.log(`some kind of error handling...`);
-//   }
-// });
+  const createdMeme = await createMeme({ templateId: selectionId, inputs });
+  console.log(createdMeme, { user: interaction.user.username });
+
+  if (createdMeme) {
+    const embed = new EmbedBuilder({
+      image: {
+        url: createdMeme.url,
+      },
+    })
+      .setTitle(`Go see your meme!`)
+      .setURL(createdMeme.page_url)
+      .setDescription(`Nice work ${interaction.user.username}! The world is now a better place.`);
+
+    interaction.reply({
+      embeds: [embed],
+      ephemeral: true,
+    });
+  } else {
+    interaction.reply(`There was an unknown error...`);
+  }
+});
 
 client.login(process.env.TOKEN);
